@@ -1,8 +1,8 @@
 # ContextCore
 
-![Dashboard](docs/images/dashboard.png)
+![Dashboard](docs/images/main.png)
 
-![AI Query](docs/images/ai-query.png)
+![AI Query](docs/images/ai_query.png)
 
 Enterprise supply chain knowledge graph + semantic layer with an AI query interface.
 
