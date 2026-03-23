@@ -2,6 +2,8 @@
 
 ![Dashboard](docs/images/main.png)
 
+![Graph Explorer](docs/images/node.png)
+
 ![AI Query](docs/images/ai_query.png)
 
 Enterprise supply chain knowledge graph + semantic layer with an AI query interface.
