@@ -1,5 +1,7 @@
 # ContextCore
 
+![Dashboard](docs/images/dashboard.png)
+
 Enterprise supply chain knowledge graph + semantic layer with an AI query interface.
 
 ## Tech Stack
