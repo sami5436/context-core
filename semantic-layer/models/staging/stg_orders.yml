@@ -1,0 +1,76 @@
+version: 2
+
+semantic_models:
+  - name: orders
+    defaults:
+      agg_time_dimension: date
+    description: >
+      Semantic model for supply chain orders. Each order moves
+      products through the supply chain, with tracking for
+      status, priority, value, and on-time performance.
+    model: ref('stg_orders')
+    entities:
+      - name: order_id
+        type: primary
+        description: Unique order identifier (e.g. ORD-001)
+        expr: id
+
+    dimensions:
+      - name: order_id
+        type: categorical
+        description: Unique identifier for the order
+        expr: id
+
+      - name: date
+        type: time
+        type_params:
+          time_granularity: day
+        description: Date the order was placed (YYYY-MM-DD)
+
+      - name: status
+        type: categorical
+        description: >
+          Current order lifecycle stage.
+          Values: Processing, In Transit, Delivered, Cancelled
+
+      - name: priority
+        type: categorical
+        description: >
+          Order urgency classification.
+          Values: Standard, Expedited, Critical
+
+      - name: on_time
+        type: categorical
+        description: >
+          Whether a delivered order arrived on time.
+          Values: true, false, null (if not yet delivered)
+
+    measures:
+      - name: total_orders
+        agg: count
+        description: Total number of orders
+        expr: id
+
+      - name: total_revenue
+        agg: sum
+        description: Sum of all order amounts
+        expr: total_amount
+
+      - name: avg_order_value
+        agg: average
+        description: Average monetary value per order
+        expr: total_amount
+
+      - name: delivered_orders
+        agg: count
+        description: Count of orders with status = Delivered
+        expr: id
+        filter:
+          - "status = 'Delivered'"
+
+      - name: on_time_orders
+        agg: count
+        description: Count of delivered orders that arrived on time
+        expr: id
+        filter:
+          - "status = 'Delivered' AND on_time = true"

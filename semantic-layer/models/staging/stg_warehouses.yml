@@ -1,0 +1,58 @@
+version: 2
+
+semantic_models:
+  - name: warehouses
+    defaults:
+      agg_time_dimension: null
+    description: >
+      Semantic model for supply chain warehouses. Tracks storage
+      facilities, their capacity limits, and current inventory
+      levels for utilization analysis.
+    model: ref('stg_warehouses')
+    entities:
+      - name: warehouse_id
+        type: primary
+        description: Unique warehouse identifier (e.g. WH-001)
+        expr: id
+
+    dimensions:
+      - name: warehouse_id
+        type: categorical
+        description: Unique identifier for the warehouse
+        expr: id
+
+      - name: name
+        type: categorical
+        description: Human-readable warehouse name
+
+      - name: location
+        type: categorical
+        description: >
+          Physical location of the warehouse (city, state).
+          Values: Newark NJ, Long Beach CA, Dallas TX, Chicago IL, Atlanta GA
+
+    measures:
+      - name: total_warehouses
+        agg: count
+        description: Total number of warehouse facilities
+        expr: id
+
+      - name: total_capacity
+        agg: sum
+        description: Combined maximum storage capacity across all warehouses
+        expr: capacity
+
+      - name: total_current_stock
+        agg: sum
+        description: Combined current inventory levels across all warehouses
+        expr: current_stock
+
+      - name: avg_capacity
+        agg: average
+        description: Average warehouse storage capacity
+        expr: capacity
+
+      - name: avg_current_stock
+        agg: average
+        description: Average current inventory level per warehouse
+        expr: current_stock

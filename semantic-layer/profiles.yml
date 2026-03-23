@@ -1,0 +1,10 @@
+context_core:
+  target: dev
+  outputs:
+    dev:
+      # This dbt project is used as a semantic contract layer over Neo4j.
+      # No SQL warehouse is targeted — models serve as documentation
+      # and metric definitions consumed by the app layer.
+      type: duckdb
+      path: ":memory:"
+      schema: main

@@ -1,0 +1,60 @@
+version: 2
+
+semantic_models:
+  - name: suppliers
+    defaults:
+      agg_time_dimension: null
+    description: >
+      Semantic model for supply chain suppliers. Each supplier
+      is rated on quality and tracked for defect rates across
+      their supplied product lines.
+    model: ref('stg_suppliers')
+    entities:
+      - name: supplier_id
+        type: primary
+        description: Unique supplier identifier (e.g. SUP-001)
+        expr: id
+
+    dimensions:
+      - name: supplier_id
+        type: categorical
+        description: Unique identifier for the supplier
+        expr: id
+
+      - name: name
+        type: categorical
+        description: Human-readable supplier name
+
+      - name: region
+        type: categorical
+        description: >
+          Geographic region where the supplier operates.
+          Values: North America, Europe, Asia Pacific, South America
+
+    measures:
+      - name: total_suppliers
+        agg: count
+        description: Total number of suppliers
+        expr: id
+
+      - name: avg_rating
+        agg: average
+        description: Average supplier quality rating (1-5 scale)
+        expr: rating
+
+      - name: avg_defect_rate
+        agg: average
+        description: >
+          Average defect rate across all suppliers.
+          Expressed as a decimal (0.02 = 2%).
+        expr: defect_rate
+
+      - name: max_defect_rate
+        agg: max
+        description: Highest defect rate among suppliers
+        expr: defect_rate
+
+      - name: min_defect_rate
+        agg: min
+        description: Lowest defect rate among suppliers
+        expr: defect_rate

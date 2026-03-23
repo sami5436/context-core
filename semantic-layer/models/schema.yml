@@ -1,0 +1,44 @@
+version: 2
+
+sources:
+  - name: neo4j_supply_chain
+    description: >
+      Supply chain knowledge graph stored in Neo4j AuraDB.
+      Nodes represent business entities; relationships encode
+      supply chain linkages.
+    meta:
+      database: Neo4j AuraDB (Free Tier)
+      query_language: Cypher
+      connection_config: data-pipeline/config.py
+    tables:
+      - name: suppliers
+        description: >
+          Organizations that supply raw materials, components, or
+          finished goods into the supply chain.
+        meta:
+          neo4j_label: Supplier
+          cypher_fetch: "MATCH (s:Supplier) RETURN s"
+
+      - name: products
+        description: >
+          Physical goods tracked through the supply chain, from
+          raw materials to finished components.
+        meta:
+          neo4j_label: Product
+          cypher_fetch: "MATCH (p:Product) RETURN p"
+
+      - name: orders
+        description: >
+          Purchase or fulfillment orders that move products
+          through the supply chain.
+        meta:
+          neo4j_label: Order
+          cypher_fetch: "MATCH (o:Order) RETURN o"
+
+      - name: warehouses
+        description: >
+          Physical storage facilities where products are held
+          between supply chain stages.
+        meta:
+          neo4j_label: Warehouse
+          cypher_fetch: "MATCH (w:Warehouse) RETURN w"

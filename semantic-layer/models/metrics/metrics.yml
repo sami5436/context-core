@@ -1,0 +1,142 @@
+version: 2
+
+metrics:
+
+  # ─────────────────────────────────────────────
+  # Supplier Defect Rate
+  # ─────────────────────────────────────────────
+  - name: supplier_defect_rate
+    label: Supplier Defect Rate
+    description: >
+      Average product defect rate across suppliers, expressed as
+      a percentage. A lower rate indicates higher supplier quality.
+      Can be sliced by region to identify geographic quality trends.
+    type: derived
+    type_params:
+      expr: avg_defect_rate * 100
+      metrics:
+        - name: avg_defect_rate
+          offset_window: null
+    meta:
+      unit: percent
+      direction: lower_is_better
+      threshold_warning: 3.0
+      threshold_critical: 5.0
+      cypher_query: >
+        MATCH (s:Supplier)
+        RETURN s.region AS region,
+               round(avg(s.defect_rate) * 100, 2) AS defect_rate_pct,
+               count(s) AS supplier_count
+        ORDER BY defect_rate_pct
+      available_dimensions:
+        - supplier_id
+        - region
+      owner: supply-chain-analytics
+      refresh_cadence: daily
+
+  # ─────────────────────────────────────────────
+  # Order Fulfillment Rate
+  # ─────────────────────────────────────────────
+  - name: order_fulfillment_rate
+    label: Order Fulfillment Rate
+    description: >
+      Percentage of total orders that have reached "Delivered"
+      status. Measures how effectively the supply chain converts
+      orders into completed deliveries.
+    type: derived
+    type_params:
+      expr: (delivered_orders * 1.0 / total_orders) * 100
+      metrics:
+        - name: delivered_orders
+          offset_window: null
+        - name: total_orders
+          offset_window: null
+    meta:
+      unit: percent
+      direction: higher_is_better
+      threshold_warning: 85.0
+      threshold_critical: 70.0
+      cypher_query: >
+        MATCH (o:Order)
+        WITH count(o) AS total,
+             sum(CASE WHEN o.status = 'Delivered' THEN 1 ELSE 0 END) AS delivered
+        RETURN total, delivered,
+               round(toFloat(delivered) / total * 100, 1) AS fulfillment_rate_pct
+      available_dimensions:
+        - priority
+        - date
+      owner: operations-team
+      refresh_cadence: daily
+
+  # ─────────────────────────────────────────────
+  # Warehouse Utilization
+  # ─────────────────────────────────────────────
+  - name: warehouse_utilization
+    label: Warehouse Utilization
+    description: >
+      Ratio of current stock to maximum capacity per warehouse,
+      expressed as a percentage. Indicates how efficiently storage
+      space is being used. High utilization (>90%) may signal
+      capacity constraints; low utilization (<50%) suggests waste.
+    type: derived
+    type_params:
+      expr: (total_current_stock * 1.0 / total_capacity) * 100
+      metrics:
+        - name: total_current_stock
+          offset_window: null
+        - name: total_capacity
+          offset_window: null
+    meta:
+      unit: percent
+      direction: neutral
+      threshold_warning_high: 90.0
+      threshold_warning_low: 40.0
+      cypher_query: >
+        MATCH (w:Warehouse)
+        RETURN w.name AS warehouse,
+               w.location AS location,
+               w.current_stock AS stock,
+               w.capacity AS capacity,
+               round(toFloat(w.current_stock) / w.capacity * 100, 1) AS utilization_pct
+        ORDER BY utilization_pct DESC
+      available_dimensions:
+        - warehouse_id
+        - location
+      owner: warehouse-ops
+      refresh_cadence: hourly
+
+  # ─────────────────────────────────────────────
+  # On-Time Delivery Rate
+  # ─────────────────────────────────────────────
+  - name: on_time_delivery_rate
+    label: On-Time Delivery Rate
+    description: >
+      Percentage of delivered orders that arrived on or before
+      the expected delivery date. A key customer satisfaction
+      indicator and supply chain reliability measure.
+    type: derived
+    type_params:
+      expr: (on_time_orders * 1.0 / delivered_orders) * 100
+      metrics:
+        - name: on_time_orders
+          offset_window: null
+        - name: delivered_orders
+          offset_window: null
+    meta:
+      unit: percent
+      direction: higher_is_better
+      threshold_warning: 90.0
+      threshold_critical: 80.0
+      cypher_query: >
+        MATCH (o:Order)
+        WHERE o.status = 'Delivered' AND o.on_time IS NOT NULL
+        RETURN count(o) AS total_delivered,
+               sum(CASE WHEN o.on_time = true THEN 1 ELSE 0 END) AS on_time,
+               round(toFloat(sum(CASE WHEN o.on_time = true THEN 1 ELSE 0 END))
+                     / count(o) * 100, 1) AS on_time_pct
+      available_dimensions:
+        - priority
+        - date
+        - region
+      owner: logistics-team
+      refresh_cadence: daily

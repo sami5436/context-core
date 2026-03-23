@@ -1,0 +1,57 @@
+version: 2
+
+semantic_models:
+  - name: products
+    defaults:
+      agg_time_dimension: null
+    description: >
+      Semantic model for supply chain products. Tracks physical
+      goods from raw materials to finished components, categorized
+      by type and costed per unit.
+    model: ref('stg_products')
+    entities:
+      - name: product_id
+        type: primary
+        description: Unique product identifier (e.g. PRD-001)
+        expr: id
+
+    dimensions:
+      - name: product_id
+        type: categorical
+        description: Unique identifier for the product
+        expr: id
+
+      - name: name
+        type: categorical
+        description: Human-readable product name
+
+      - name: product_category
+        type: categorical
+        description: >
+          Product classification group.
+          Values: Electronics, Structural, Packaging, Mechanical, Raw Materials
+
+      - name: sku
+        type: categorical
+        description: Stock keeping unit code for inventory tracking
+
+    measures:
+      - name: total_products
+        agg: count
+        description: Total number of distinct products
+        expr: id
+
+      - name: avg_unit_cost
+        agg: average
+        description: Average cost per unit across products
+        expr: unit_cost
+
+      - name: total_unit_cost
+        agg: sum
+        description: Sum of all product unit costs
+        expr: unit_cost
+
+      - name: max_unit_cost
+        agg: max
+        description: Highest unit cost among products
+        expr: unit_cost
