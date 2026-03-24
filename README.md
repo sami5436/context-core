@@ -26,6 +26,18 @@ Enterprise supply chain knowledge graph + semantic layer with an AI query interf
 | `feat/ai-query` | Natural language to Cypher via Ollama |
 | `feat/graph-viz` | Interactive graph visualization |
 
+## Project Structure
+
+This repository is organized into distinct logical components:
+
+- **`data-pipeline/`**: Python scripts for generating mock supply chain data and securely seeding the Neo4j graph database. Contains schema verification and robust Cypher ingestion logic.
+- **`semantic-layer/`**: A dbt Core project defining context contracts. It centralizes key performance metrics (defect rates, fulfillment, etc.) using YAML, abstracting complex Cypher logic away from the frontend.
+- **`web/`**: The Next.js 14 frontend application.
+  - `src/app/api/`: Server-side API routes for executing LLM queries, computing metrics, and extracting full graph data.
+  - `src/app/`: The UI pages (Dashboard, AI Query, Graph Explorer) built with Tailwind CSS.
+  - `src/lib/`: Core utilities including the Neo4j driver connection and schema definitions for the LLM context.
+- **`docs/`**: Assets and documentation screenshots.
+
 ## Getting Started
 
 ### Prerequisites
